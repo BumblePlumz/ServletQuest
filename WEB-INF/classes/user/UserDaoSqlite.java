@@ -33,10 +33,14 @@ public class UserDaoSqlite implements UserDao {
 			pst.setString(1, user.getFirstname());
 			pst.setString(2, user.getLastname());
 			pst.setString(3, user.getEmail());
-			pst.setString(4, user.getPassword());
+			pst.setString(4, password);
 			boolean success = pst.execute();
+			System.out.println("Succes : "+success);
 			if (!success){
+				System.out.println("success failed");
 				throw new SQLException();
+			}else{
+				System.out.println("Création réussite");
 			}
 		}catch (SQLException e){
 			System.out.println("erreur add user");
@@ -100,7 +104,7 @@ public class UserDaoSqlite implements UserDao {
 	
 	@Override
 	public long checkPassword(String email, String password) {
-		// TODO : get user id that match, return -1 if none
+		// get user id that match, return -1 if none
 		String sql = "SELECT id FROM users WHERE email=? AND password=?";
 		long result = -1;
 		try {
@@ -112,7 +116,7 @@ public class UserDaoSqlite implements UserDao {
 				result = rs.getLong("id");
 			}
 		}catch (SQLException e){
-			System.out.println("erreur findByEmail user");
+			System.out.println("erreur checkPassword user");
 		}
 		return result;
 	}

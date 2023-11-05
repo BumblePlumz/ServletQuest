@@ -18,7 +18,7 @@ public class RegisterServlet extends HttpServlet {
 	@Override
 	public void init() {
 		try {
-			this.userDao = new UserDaoSqlite("../../users.db");
+			this.userDao = new UserDaoSqlite("C:\\xampp\\tomcat\\webapps\\ServletQuest\\WEB-INF\\users.db");
 		} catch (SQLException e) {
 			System.out.println("Erreur dans l'init");
 		}
@@ -26,16 +26,11 @@ public class RegisterServlet extends HttpServlet {
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		// Récupération des inputs du formulaire
-		String firstname = req.getParameter("firstname");
-		String lastname = req.getParameter("lastname");
-		String email = req.getParameter("email");
-		String pwd = req.getParameter("pwd");
-		String confirmPwd = req.getParameter("pwdConfirm");
-		System.out.println(firstname);
-		System.out.println(lastname);
-		System.out.println(email);
-		System.out.println(pwd);
-		System.out.println(confirmPwd);
+		String firstname = req.getParameter("firstname").toLowerCase().trim();
+		String lastname = req.getParameter("lastname").toLowerCase().trim();
+		String email = req.getParameter("email").toLowerCase().trim();
+		String pwd = req.getParameter("pwd").trim();
+		String confirmPwd = req.getParameter("pwdConfirm").trim();
 
 		if ((pwd.isEmpty() || confirmPwd.isEmpty()) || (!pwd.isEmpty() && !confirmPwd.isEmpty() && !pwd.equals(confirmPwd))){
 			req.setAttribute("errorMsg", "Une erreur est survenue dans la création d'un utilisateur");
@@ -43,14 +38,20 @@ public class RegisterServlet extends HttpServlet {
 		}
 
 		// Création utilisateur
-		userDao.add(new User(firstname, lastname, email), pwd);
+		System.out.println(firstname);
+		System.out.println(lastname);
+		System.out.println(email);
+		System.out.println(pwd);
+		System.out.println(confirmPwd);
+		User u = new User(firstname, lastname, email, pwd);
+		userDao.add(u, u.getPassword());
 		long id = userDao.exists(email);
 		if (id == -1){
 			req.setAttribute("errorMsg", "Une erreur est survenue dans la création d'un utilisateur");
 			resp.sendRedirect("/register.jsp");
 		}
 		// Rediretion
-		RequestDispatcher rq = req.getRequestDispatcher("/register.jsp");
+		RequestDispatcher rq = req.getRequestDispatcher("/auth.jsp");
 		rq.forward(req, resp);
 	}
 

@@ -14,10 +14,11 @@ public class User {
 		this.email = email;
 		this.password = password;
 	}
-	public User(String firstname, String lastname, String email) {
+	public User(String firstname, String lastname, String email, String pwd) {
 		this.firstname = firstname;
 		this.lastname = lastname;
 		this.email = email;
+		this.password = pwd;
 	}
 	public String getPassword() {
 		return password;
