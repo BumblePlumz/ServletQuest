@@ -26,33 +26,38 @@ public class RegisterServlet extends HttpServlet {
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		// Récupération des inputs du formulaire
-		String firstname = req.getParameter("firstname").toLowerCase().trim();
-		String lastname = req.getParameter("lastname").toLowerCase().trim();
-		String email = req.getParameter("email").toLowerCase().trim();
-		String pwd = req.getParameter("pwd").trim();
-		String confirmPwd = req.getParameter("pwdConfirm").trim();
+		String firstname = req.getParameter("firstname");
+		String lastname = req.getParameter("lastname");
+		String email = req.getParameter("email");
+		String pwd = req.getParameter("password");
+		String confirmPwd = req.getParameter("confirmPassword");
 
-		if ((pwd.isEmpty() || confirmPwd.isEmpty()) || (!pwd.isEmpty() && !confirmPwd.isEmpty() && !pwd.equals(confirmPwd))){
-			req.setAttribute("errorMsg", "Une erreur est survenue dans la création d'un utilisateur");
-			resp.sendRedirect("/register.jsp");
+		if (checkNullEmpty(req,"firstname", firstname) || checkNullEmpty(req,"lastname", lastname) || checkNullEmpty(req,"email", email) || checkNullEmpty(req, "password", pwd)){
+			req.getRequestDispatcher("/register.jsp").forward(req, resp);
+		}else{
+			if (!pwd.equals(confirmPwd)){
+				req.setAttribute("errorMessage", "Le mot de passe et la confirmation ne correspondent pas");
+				req.getRequestDispatcher("register.jsp").forward(req, resp);
+			}else{
+				long id = userDao.exists(email);
+				if (id != -1){
+					req.setAttribute("emailError", "Un utilisateur avec cet email existe déjà");
+					req.getRequestDispatcher("/register.jsp").forward(req, resp);
+				}else{
+					// Création utilisateur
+					userDao.add(new User(firstname, lastname, email, pwd), pwd);
+					resp.setStatus(HttpServletResponse.SC_MOVED_TEMPORARILY);
+					resp.sendRedirect("/auth.jsp");
+				}
+			}
 		}
-
-		// Création utilisateur
-		System.out.println(firstname);
-		System.out.println(lastname);
-		System.out.println(email);
-		System.out.println(pwd);
-		System.out.println(confirmPwd);
-		User u = new User(firstname, lastname, email, pwd);
-		userDao.add(u, u.getPassword());
-		long id = userDao.exists(email);
-		if (id == -1){
-			req.setAttribute("errorMsg", "Une erreur est survenue dans la création d'un utilisateur");
-			resp.sendRedirect("/register.jsp");
-		}
-		// Rediretion
-		RequestDispatcher rq = req.getRequestDispatcher("/auth.jsp");
-		rq.forward(req, resp);
 	}
 
+	private boolean checkNullEmpty(HttpServletRequest req, String element, String value) {
+		if (value == null || value.isEmpty()){
+			req.setAttribute("errorMessage", "le champ : " + element + " n'est pas valide.");
+			return true;
+		}
+		return false;
+	}
 }

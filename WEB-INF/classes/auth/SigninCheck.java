@@ -26,7 +26,7 @@ public class SigninCheck {
 	public void initWebTool() {
 		String port = System.getProperty("usePort");
 		int iPort = ( port == null ? 8080 : Integer.parseInt(port) );
-		web = new WebTool("localhost:"+iPort, "/exo201/");
+		web = new WebTool("localhost:"+iPort, "/ServletQuest/");
 	}
 
 	@Test

@@ -139,7 +139,6 @@ public class UserDaoSqlite implements UserDao {
 	
 	@Override
 	public long exists(String email) {
-		// TODO : check if user with that mail exists
 		long result = -1;
 		String sql = "SELECT * FROM users WHERE email=?";
 		try (PreparedStatement pst = conn.prepareStatement(sql)){
